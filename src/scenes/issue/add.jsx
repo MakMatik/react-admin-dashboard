@@ -19,10 +19,15 @@ import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 const Add = () => {
+  const [issues, setIssues] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [priority, setPriorities] = useState([]);
+  const [department, setDepartment] = useState([]);
+  const [process, setProcess] = useState([]);
   const [inputs, setInputs] = useState({
     approval: "",
     description: "",
@@ -41,10 +46,9 @@ const Add = () => {
   // const [value, setValue] = React.useState(dayjs('2014-08-18T21:11:54'));
 
   const addIssue = async (inputs, onSubmitProps) => {
-    const result = await axios.post('http://localhost:3000/api/post', inputs);
-    console.log(result.data.data); 
+    const result = await axios.post("http://localhost:3000/api/post", inputs);
+    console.log(result.data.data);
   };
-
 
   const handleFormSubmit = async (values, onSubmitProps) => {
     addIssue(values, onSubmitProps);
@@ -57,12 +61,21 @@ const Add = () => {
     console.log(inputs);
   };
 
+  useEffect(() => {
+    const getIssues = async () => {
+      await fetch("http://localhost:3000/api/getAll")
+        .then((response) => response.json())
+        .then((json) => setIssues(json));
+    };
+    getIssues();
+  }, []);
+
   const handleChange = (e) => {
     setInputs((prevState) => ({
-      ...prevState, 
-    [e.target.name]:e.target.value,
-}));
-  }
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   return (
     <Box m="20px">
@@ -133,6 +146,7 @@ const Add = () => {
               />
               <TextField
                 fullWidth
+                select
                 variant="filled"
                 type="text"
                 label="Assigned To"
@@ -143,7 +157,13 @@ const Add = () => {
                 // error={!!touched.assignee && !!errors.assignee}
                 // helperText={touched.assignee && errors.assignee}
                 sx={{ gridColumn: "span 2" }}
-              />
+              >
+                {issues.map((params) => (
+                  <MenuItem key={params._id} value={params.assignee}>
+                    {params.assignee}
+                  </MenuItem>
+                ))}
+              </TextField>
               <TextField
                 fullWidth
                 variant="filled"
@@ -292,30 +312,30 @@ const Add = () => {
   );
 };
 
-  const issueSchema = yup.object().shape({
-    Approval: yup.string().required("required"),
-    description: yup.string().required("required"),
-    action_required: yup.string().required("required"),
-    assignee: yup.string().required("required"),
-    priority: yup.string().required("required"),
-    department: yup.string().required("required"),
-    process: yup.string().required("required"),
-    status: yup.string().required("required"),
-    date_raised: yup.string().required("required"),
-    date_due: yup.string().required("required"),
-  });
-  
-  const initialValuesIssue = {
-    approval: "",
-    description: "",
-    action_required: "",
-    assignee: "",
-    priority: "",
-    department: "",
-    process: "",
-    status: "",
-    date_raised: "",
-    date_due: "",
-  };
+const issueSchema = yup.object().shape({
+  Approval: yup.string().required("required"),
+  description: yup.string().required("required"),
+  action_required: yup.string().required("required"),
+  assignee: yup.string().required("required"),
+  priority: yup.string().required("required"),
+  department: yup.string().required("required"),
+  process: yup.string().required("required"),
+  status: yup.string().required("required"),
+  date_raised: yup.string().required("required"),
+  date_due: yup.string().required("required"),
+});
+
+const initialValuesIssue = {
+  approval: "",
+  description: "",
+  action_required: "",
+  assignee: "",
+  priority: "",
+  department: "",
+  process: "",
+  status: "",
+  date_raised: "",
+  date_due: "",
+};
 
 export default Add;

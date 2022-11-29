@@ -18,6 +18,7 @@ import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar/calendar";
 import Add from "./scenes/issue/add";
 import Edit from "./scenes/issue/edit";
+import AddTask from "./scenes/task/add";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -35,7 +36,9 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/issue" element={<Issues />} />
               <Route path="/issue/add" element={<Add />} />
-              <Route path="/issue/edit" element={<Edit/>} />
+              <Route path="/issue/edit" element={<Edit />} />
+              <Route path="/issue/task/add" element={<AddTask />} />
+              <Route path="/issue/task/edit" element={<Edit />} />
               <Route path="/team" element={<Team />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/invoices" element={<Invoices />} />

@@ -12,14 +12,13 @@ import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettin
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
-import * as React from 'react';
+import * as React from "react";
 import axios from "axios";
-
-
 
 const Issues = () => {
   const [users, setUsers] = useState([]);
-  const [issue, setIssue] = useState([]);
+  const [issues, setIssues] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [pageSize, setPageSize] = React.useState(10);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -27,45 +26,66 @@ const Issues = () => {
   const handleCellClick = (param, event) => {
     event.stopPropagation();
   };
-  
+
   const handleRowClick = (param, event) => {
     event.stopPropagation();
   };
 
-  const getIssue = async (id) => {
-    const result = await axios.get("http://localhost:3000/api/getOne/"+id);
-    // const data = await result.json();
-    // console.log(result);
-    setIssue(result.data);
+  const checkKeysUnderObject = (obj, result) => {
+    for (let key in obj) {
+      if (key) {
+        result.push(key + " : " + obj[key]);
+      }
+    }
   };
 
-  const onButtonClick = (e, row) => {
+  const getIssue = async (id) => {
+    const result = await axios.get("http://localhost:3000/api/getOne/" + id);
+    // const data = await result.json();
+    // console.log(result);
+    setIssues(result.data);
+    return result.data;
+  };
+
+  const onButtonClick = async (e, row) => {
     e.stopPropagation();
     //alert(row);
-    try { 
-      getIssue(row);
-      console.log(issue);
-      alert(issue.description);
-  } catch (error) {
+    try {
+      const iss = await getIssue(row);
+      console.log(issues);
+      console.log(tasks);
+      alert(iss.description);
+    } catch (error) {
       console.log(error);
     }
     //alert(issue);
     //do whatever you want with the row
-};
+  };
 
-  const getIssues = async () => {
+  /*   const getIssues = async () => {
     const response = await fetch("http://localhost:3000/api/getAll");
     const data = await response.json();
     console.log(data);
     setUsers(data);
-  };
+  }; */
 
   useEffect(() => {
+    const getIssues = async () => {
+    await
     fetch("http://localhost:3000/api/getAll")
       .then((response) => response.json())
-      .then((json)=>setUsers(json))
-   }, []);
-  
+      .then((json) => setIssues(json));
+    }
+    getIssues();
+    // const getTasks = async () => {
+    // await
+    // fetch("http://localhost:3000/api/task/getAll")
+    //   .then((response) => response.json())
+    //   .then((json) => setTasks(json));
+    // }
+    // getTasks();
+  }, []);
+
   const columns = [
     //{ field: "_id", headerName: "ID" },
     {
@@ -103,14 +123,28 @@ const Issues = () => {
       field: "subtask",
       headerName: "Subtask",
       flex: 1,
+      valueGetter: (params) => {
+        //console.log({ params });
+        let result = [];
+        if (params.row.subtask) {
+          for (let i = 1; i < params.row.subtask.length + 1; i++) {
+            result.push("Task: " + i + params.row.subtask + "<br></br>");
+          }
+        } else {
+          result = ["No Subtasks."];
+        }
+        return result.join(",<br></br> /r/n");
+      },
     },
     {
-      field: "test", headerName: "Test",
+      field: "test",
+      headerName: "Test",
       renderCell: ({ row: { _id } }) => {
         return (
           <Button
             variant="outlined"
             color="secondary"
+            href="/issue/task/add"
             onClick={(e) => {
               onButtonClick(e, _id);
             }}
@@ -118,7 +152,7 @@ const Issues = () => {
             Add Subtask
           </Button>
         );
-      }
+      },
     },
     {
       field: "date_raised",
@@ -190,7 +224,7 @@ const Issues = () => {
           Delete Selected
         </Button>
       </Box>
-      
+
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -220,9 +254,16 @@ const Issues = () => {
           },
         }}
       >
-        <DataGrid checkboxSelection rows={users} columns={columns} getRowId={(row) => row._id}
-          loading={!users.length } pageSize={pageSize} onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          rowsPerPageOptions={[10, 20, 50]}/>
+        <DataGrid
+          checkboxSelection
+          rows={issues}
+          columns={columns}
+          getRowId={(row) => row._id}
+          loading={!issues.length}
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+          rowsPerPageOptions={[10, 20, 50]}
+        />
       </Box>
     </Box>
   );
