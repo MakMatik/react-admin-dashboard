@@ -40,7 +40,7 @@ const Issues = () => {
   };
 
   const getIssue = async (id) => {
-    const result = await axios.get("http://localhost:3000/api/getOne/" + id);
+    const result = await axios.get("http://localhost:8080/api/getAll/" + id);
     // const data = await result.json();
     // console.log(result);
     setIssues(result.data);
@@ -71,15 +71,14 @@ const Issues = () => {
 
   useEffect(() => {
     const getIssues = async () => {
-    await
-    fetch("http://localhost:3000/api/getAll")
-      .then((response) => response.json())
-      .then((json) => setIssues(json));
-    }
+      await fetch("http://localhost:8080/api/issue")
+        .then((response) => response.json())
+        .then((json) => setIssues(json));
+    };
     getIssues();
     // const getTasks = async () => {
     // await
-    // fetch("http://localhost:3000/api/task/getAll")
+    // fetch("http://localhost:3000/api/action/getAll")
     //   .then((response) => response.json())
     //   .then((json) => setTasks(json));
     // }
@@ -108,20 +107,65 @@ const Issues = () => {
       field: "priority",
       headerName: "Priority",
       flex: 1,
+      valueGetter: (params) => {
+        console.log({ params });
+        let result = [];
+        if (params.row.priority) {
+          if (params.row.priority.name) {
+            result.push(params.row.priority.name);
+          }
+        }
+        return result.join(", ");
+      },
     },
     {
-      field: "process",
-      headerName: "Process",
+      field: "approval",
+      headerName: "Approval",
       flex: 1,
+      valueGetter: (params) => {
+        console.log({ params });
+        let result = [];
+        if (params.row.approval) {
+          if (params.row.approval.name) {
+            result.push(params.row.approval.name);
+          }
+        }
+        return result.join(", ");
+      },
     },
     {
       field: "department",
       headerName: "Department",
       flex: 1,
+      valueGetter: (params) => {
+        console.log({ params });
+        let result = [];
+        if (params.row.department) {
+          if (params.row.department.name) {
+            result.push(params.row.department.name);
+          }
+        }
+        return result.join(", ");
+      },
     },
     {
-      field: "subtask",
-      headerName: "Subtask",
+      field: "process",
+      headerName: "Process",
+      flex: 1,
+      valueGetter: (params) => {
+        console.log({ params });
+        let result = [];
+        if (params.row.process) {
+          if (params.row.process.name) {
+            result.push(params.row.process.name);
+          }
+        }
+        return result.join(", ");
+      },
+    },
+    {
+      field: "action",
+      headerName: "Action",
       flex: 1,
       valueGetter: (params) => {
         //console.log({ params });
@@ -137,8 +181,20 @@ const Issues = () => {
       },
     },
     {
-      field: "test",
-      headerName: "Test",
+      field: "date_raised",
+      type: "date",
+      headerName: "Date Raised",
+      flex: 1,
+    },
+    {
+      field: "date_due",
+      type: "date",
+      headerName: "Date Due",
+      flex: 1,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
       renderCell: ({ row: { _id } }) => {
         return (
           <Button
@@ -153,18 +209,6 @@ const Issues = () => {
           </Button>
         );
       },
-    },
-    {
-      field: "date_raised",
-      type: "date",
-      headerName: "Date Raised",
-      flex: 1,
-    },
-    {
-      field: "date_due",
-      type: "date",
-      headerName: "Date Due",
-      flex: 1,
     },
     // {
     //   field: "accessLevel",
@@ -231,9 +275,13 @@ const Issues = () => {
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
+            // whiteSpace: "normal !important",
+            // wordWrap: "break-word !important",
           },
           "& .MuiDataGrid-cell": {
             borderBottom: "none",
+            whiteSpace: "normal !important",
+            wordWrap: "break-word !important",
           },
           "& .name-column--cell": {
             color: colors.greenAccent[300],
@@ -255,10 +303,10 @@ const Issues = () => {
         }}
       >
         <DataGrid
-          checkboxSelection
+          // checkboxSelection
           rows={issues}
           columns={columns}
-          getRowId={(row) => row._id}
+          getRowId={(row) => row.id}
           loading={!issues.length}
           pageSize={pageSize}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}

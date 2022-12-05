@@ -19,6 +19,7 @@ import Calendar from "./scenes/calendar/calendar";
 import Add from "./scenes/issue/add";
 import Edit from "./scenes/issue/edit";
 import AddTask from "./scenes/task/add";
+import Admin from "./scenes/admin";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -34,6 +35,11 @@ function App() {
             <Topbar setIsSidebar={setIsSidebar} />
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/admin" element={<Admin />} />
+              {/* <Route path="/admin/add/user" element={<Admin />} />
+              <Route path="/admin/add/department" element={<Admin />} />
+              <Route path="/admin/add/process" element={<Admin />} />
+              <Route path="/admin/add/approval" element={<Admin />} /> */}
               <Route path="/issue" element={<Issues />} />
               <Route path="/issue/add" element={<Add />} />
               <Route path="/issue/edit" element={<Edit />} />
